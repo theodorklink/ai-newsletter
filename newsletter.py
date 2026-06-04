@@ -161,13 +161,12 @@ def send_email(html_body: str):
     msg["From"]    = ICLOUD_EMAIL
     msg["To"]      = RECIPIENT_EMAIL
 
-    # Plain-text fallback
     plain = "Dein personalisierter AI-Newsletter. Bitte öffne diese E-Mail in einem HTML-fähigen Client."
     msg.attach(MIMEText(plain, "plain"))
     msg.attach(MIMEText(html_body, "html"))
 
-with smtplib.SMTP_SSL("smtp.mail.me.com", 465) as server:
-server.login(ICLOUD_EMAIL, ICLOUD_APP_PW)
+    with smtplib.SMTP_SSL("smtp.mail.me.com", 465) as server:
+        server.login(ICLOUD_EMAIL, ICLOUD_APP_PW)
         server.sendmail(ICLOUD_EMAIL, RECIPIENT_EMAIL, msg.as_string())
 
     print(f"[OK] Newsletter sent to {RECIPIENT_EMAIL}")
