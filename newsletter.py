@@ -1,23 +1,21 @@
 """
 AI Newsletter Generator
 Fetches RSS feeds, generates a curated newsletter via Claude API,
-and sends it to your iCloud email address.
+and sends it via SendGrid to your iCloud email address.
 """
 
 import feedparser
 import anthropic
-import smtplib
+import sendgrid
 import os
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+from sendgrid.helpers.mail import Mail
 from datetime import datetime, timezone
-from dateutil import parser as date_parser
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
-ICLOUD_EMAIL      = os.environ["ICLOUD_EMAIL"]        # e.g. yourname@icloud.com
-ICLOUD_APP_PW     = os.environ["ICLOUD_APP_PASSWORD"] # App-specific password from Apple ID
+SENDGRID_API_KEY  = os.environ["SENDGRID_API_KEY"]
+ICLOUD_EMAIL      = os.environ["ICLOUD_EMAIL"]
 RECIPIENT_EMAIL   = os.environ.get("RECIPIENT_EMAIL", ICLOUD_EMAIL)
 
 # How many hours back to collect articles (48h = every 2 days)
@@ -27,8 +25,6 @@ LOOKBACK_HOURS = 48
 MAX_ARTICLES = 40
 
 # ── RSS Feed Sources ───────────────────────────────────────────────────────────
-# Curated stack covering research, policy, developer tools, and AI in media.
-# Add or remove feeds freely — just keep the list format.
 
 FEEDS = [
     # Research & Foundation Models
@@ -60,6 +56,7 @@ FEEDS = [
 
 def fetch_recent_articles(lookback_hours: int = LOOKBACK_HOURS) -> list[dict]:
     """Pull articles from all feeds published within the lookback window."""
+    import calendar
     cutoff = datetime.now(timezone.utc).timestamp() - lookback_hours * 3600
     articles = []
 
@@ -67,27 +64,24 @@ def fetch_recent_articles(lookback_hours: int = LOOKBACK_HOURS) -> list[dict]:
         try:
             feed = feedparser.parse(url)
             for entry in feed.entries:
-                # Parse publish date
                 published = None
                 for attr in ("published_parsed", "updated_parsed"):
                     val = getattr(entry, attr, None)
                     if val:
-                        import calendar
                         published = calendar.timegm(val)
                         break
 
                 if published and published >= cutoff:
                     articles.append({
-                        "source":  name,
-                        "title":   entry.get("title", "No title"),
-                        "url":     entry.get("link", ""),
-                        "summary": entry.get("summary", entry.get("description", ""))[:600],
+                        "source":    name,
+                        "title":     entry.get("title", "No title"),
+                        "url":       entry.get("link", ""),
+                        "summary":   entry.get("summary", entry.get("description", ""))[:600],
                         "published": datetime.fromtimestamp(published, tz=timezone.utc).strftime("%d.%m. %H:%M"),
                     })
         except Exception as e:
             print(f"[WARN] Could not fetch {name}: {e}")
 
-    # Sort newest first, cap total
     articles.sort(key=lambda a: a["published"], reverse=True)
     return articles[:MAX_ARTICLES]
 
@@ -131,7 +125,7 @@ Output a COMPLETE, self-contained HTML email. Requirements:
 - HTML styling: clean, readable, dark navy background (#0f172a), white text,
   accent color #60a5fa (blue), monospace font for section labels,
   max-width 680px, generous padding. Make it look great in an email client.
-- Do NOT include any markdown — pure HTML only.
+- Do NOT include any markdown -- pure HTML only.
 """.strip()
 
     user_prompt = f"""
@@ -152,24 +146,20 @@ Write the full newsletter HTML now.
 
 
 def send_email(html_body: str):
-    """Send the newsletter via iCloud SMTP."""
+    """Send the newsletter via SendGrid."""
     date_str = datetime.now().strftime("%d.%m.%Y")
-    subject  = f"🤖 Dein AI-Newsletter — {date_str}"
+    subject  = f"Dein AI-Newsletter - {date_str}"
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = ICLOUD_EMAIL
-    msg["To"]      = RECIPIENT_EMAIL
+    message = Mail(
+        from_email=ICLOUD_EMAIL,
+        to_emails=RECIPIENT_EMAIL,
+        subject=subject,
+        html_content=html_body,
+    )
 
-    plain = "Dein personalisierter AI-Newsletter. Bitte öffne diese E-Mail in einem HTML-fähigen Client."
-    msg.attach(MIMEText(plain, "plain"))
-    msg.attach(MIMEText(html_body, "html"))
-
-    with smtplib.SMTP_SSL("smtp.mail.me.com", 465) as server:
-        server.login(ICLOUD_EMAIL, ICLOUD_APP_PW)
-        server.sendmail(ICLOUD_EMAIL, RECIPIENT_EMAIL, msg.as_string())
-
-    print(f"[OK] Newsletter sent to {RECIPIENT_EMAIL}")
+    sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
+    response = sg.send(message)
+    print(f"[OK] Newsletter sent. Status: {response.status_code}")
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
