@@ -109,68 +109,98 @@ Er ist 21 Jahre alt, deutscher BWL-Student an der WHU, aktuell Praktikant im Str
 & M&A Team von Axel Springer in New York. Er baut gezielt seine Tech-Kompetenz aus und denkt
 langfristig über eine eigene Gründung nach.
 
-DESIGN: Financial Times-Optik. Creme-weißer Hintergrund (#FFF1E0), dunkelbraune Schrift (#333333),
-FT-typischer Akzent in Lachs/Rosa (#F2A56A). Serifenschrift: Georgia oder "Times New Roman" für
-Fließtext und Headlines. Monospace nur für Labels/Tags. Klare Spaltenstruktur, journalistisch bündig,
-kein verspieltes Design. Max-width 680px. Wirkungsvoller Header mit Ausgabennummer und Datum.
-Trennlinien zwischen Sektionen. Kompakte Paragraphen, linksbündig, kein Flattersatz.
+DESIGN: Financial Times-Optik.
+- Hintergrund: #FFF1E0 (FT-Creme)
+- Primärschrift: #333333
+- Sekundärschrift / Labels: #6B6B6B
+- Akzentfarbe: #C8611A (sattes, tiefes Orange, kein Gelb)
+- Links: #C8611A
+- Trennlinien: #D4B896
+- Schrift: Georgia, "Times New Roman", serif fuer Fliesstext und Headlines
+- Monospace nur fuer Sektions-Labels (letter-spacing: 0.12em, uppercase, font-size: 11px)
+- Fliesstext font-size: 17px, line-height: 1.75
+- H2 (Story-Titel): 22px
+- H3 (Untertitel): 18px
+- Max-width: 680px, zentriert, padding: 40px 32px
+- Journalistisch buendig, keine verspielten Elemente
+- Trennlinien (1px solid #D4B896) zwischen allen Sektionen
 
-SPRACHE: Deutsch. Englische Eigennamen, Modellnamen, Firmennamen und Fachbegriffe bleiben Englisch.
-Stil: nüchtern, präzise, direkt. Kein Marketing-Sprech, keine Superlative ohne Substanz.
-Fakten zuerst, Einordnung danach. Kurze Sätze bevorzugen.
+SPRACHE: Deutsch. Englische Eigennamen, Modellnamen, Firmennamen, Fachbegriffe bleiben Englisch.
+Stil: nuechtern, praezise, direkt. Kein Marketing-Sprech. Fakten zuerst, Einordnung danach.
+Kurze Saetze. Zeitungsqualitaet.
+
+INHALT: Sei so vollstaendig und detailliert wie moeglich. Lass keine relevante Entwicklung weg,
+auch wenn sie klein wirkt. Einzelne X-Posts von bekannten AI-Forschern, Lab-Accounts oder
+einflussreichen Tech-Persoenlichkeiten sind explizit willkommen und sollen zitiert oder
+zusammengefasst werden. Diskussionen auf Reddit, HackerNews oder in Foren koennen eingebracht
+werden wenn sie substanziell sind. Lieber zu viel als zu wenig.
 
 STRUKTUR (exakt in dieser Reihenfolge):
 
 1. HEADER
-   FT-typischer Zeitungskopf: "THE AI BRIEFING" in Versalien, Ausgabedatum, Tagline.
+   "THE AI BRIEFING" in Versalien, Georgia Bold, 38px. Darunter: Datum und Ausgabennummer.
+   Tagline kursiv: "Ihr zweiwöchentlicher Überblick über künstliche Intelligenz, Märkte und Geopolitik"
+   Trennlinie.
 
-2. LAGE DES MARKTES (2-3 Absätze)
-   Überblick über den globalen AI-Markt der letzten Tage. Wo stehen wir gerade?
-   Was hat sich seit der letzten Ausgabe verändert? Tonalität wie ein FT-Leitartikel.
+2. LAGE DES MARKTES
+   Label: "LAGE DES MARKTES"
+   2-3 Absaetze. Globaler AI-Markt der letzten Tage. Was hat sich seit der letzten Ausgabe
+   veraendert? Wo stehen die grossen Labore, die Boersen, die Regulierer? Ton: FT-Leitartikel.
 
-3. TOP STORY (300-400 Wörter)
-   Die wichtigste Einzelentwicklung der Periode. Tiefgang, Kontext, Implikationen.
-   Verlinkter Titel als H2-Überschrift.
+3. TOP STORY
+   Label: "TOP STORY"
+   Die wichtigste Einzelentwicklung. 300-400 Woerter. Verlinkter H2-Titel.
+   Tiefgang, Kontext, Implikationen fuer Industrie und Gesellschaft.
 
 4. FUNDING & M&A
-   Neue Finanzierungsrunden, Übernahmen, Exits. Pro Eintrag: 2-3 Sätze mit Betrag,
-   Investoren, strategischer Bedeutung. Verlinkter Titel.
+   Label: "FUNDING & M&A"
+   Neue Finanzierungsrunden, Uebernahmen, Exits, Bewertungen.
+   Pro Eintrag: verlinkter Titel, 2-4 Saetze mit Betrag, Investoren, strategischer Bedeutung.
 
 5. NEUE MODELLE & BENCHMARKS
-   Welche Modelle wurden released oder angekündigt? Was sagen die Benchmarks?
-   Einordnung: Ist das ein echter Fortschritt oder Marketing?
+   Label: "MODELLE & BENCHMARKS"
+   Releases, Ankuendigungen, technische Paper. Was sagen die Benchmarks?
+   Kritische Einordnung: echter Fortschritt oder Marketing?
 
 6. TOOLS & PRODUKTE
-   Neue Developer-Tools, Produktlaunches, API-Updates. Kurz und konkret.
+   Label: "TOOLS & PRODUKTE"
+   Neue Developer-Tools, API-Updates, Produktlaunches. Kurz, konkret, mit Link.
 
 7. GEOPOLITIK & REGULIERUNG
-   US-China-Rivalität, AGI-Rennen, Regulierungsvorhaben in EU/USA/China.
-   Aussagen wichtiger Stimmen aus der Industrie (CEOs, Forscher, Politiker).
-   Was sagen einflussreiche Stimmen auf Twitter/X, in Podcasts, in Essays?
+   Label: "GEOPOLITIK & REGULIERUNG"
+   US-China-Rivalitaet, AGI-Rennen, Regulierungsvorhaben EU/USA/China.
+   Aussagen wichtiger Persoenlichkeiten: CEOs, Forscher, Politiker.
+   X-Posts, Podcast-Aussagen, Essays von einflussreichen Stimmen explizit einbauen
+   (Altman, LeCun, Hinton, Karpathy, Sutskever, politische Entscheidungstraeger etc.).
 
-8. MEINUNGSKOLUMNE (200-250 Wörter)
-   Ein kritischer Kommentar zu einem Thema der Ausgabe. Geschrieben aus der Perspektive
-   eines skeptischen, informierten Beobachters. Klar als Meinung gekennzeichnet.
+8. MEINUNGSKOLUMNE
+   Label: "KOMMENTAR"
+   200-250 Woerter. Kritischer Kommentar zu einem Thema der Ausgabe.
+   Perspektive eines skeptischen, informierten Beobachters. Klar als Meinung gekennzeichnet.
    Darf provozieren und gegen den Mainstream argumentieren.
 
-9. FUR DICH ALS STUDENT & ZUKUNFTIGER GRUNGER
-   3-5 konkrete Punkte: Was bedeuten die Entwicklungen dieser Ausgabe für einen
-   Wirtschaftsstudenten mit Tech-Ambitionen? Welche Skills, welche Chancen, welche Risiken?
-   Praktisch, nicht abstrakt.
+9. TAKEAWAYS
+   Label: "TAKEAWAYS"
+   3-5 konkrete Punkte fuer Theodor persoenlich: Was bedeuten diese Entwicklungen fuer einen
+   Wirtschaftsstudenten mit Tech-Ambitionen und Gruendungsgedanken? Welche Skills, Chancen,
+   Risiken? Praktisch und direkt, keine Plattitueden.
 
 10. MEDIENEMPFEHLUNGEN
-    3-5 Empfehlungen: Podcasts, YouTube-Videos, Dokumentationen, Bücher, Essays, Interviews.
-    Nur wenn wirklich relevant zur Ausgabe. Format: Titel, Typ, 1 Satz warum.
+    Label: "EMPFEHLUNGEN"
+    3-5 Empfehlungen: Podcasts, YouTube-Videos, Dokumentationen, Buecher, Essays, Interviews.
+    Nur wenn wirklich relevant zur Ausgabe. Format: verlinkter Titel, Typ in Klammern, 1 Satz Begruendung.
 
 11. KURZMELDUNGEN
-    Restliche Neuigkeiten: je 1-2 Sätze mit Link. Kompakt wie Bloomberg-Ticker.
+    Label: "KURZMELDUNGEN"
+    Alle weiteren Neuigkeiten: je 1-2 Saetze mit verlinktem Titel. Bloomberg-Ticker-Stil.
+    Auch kleine Meldungen, interessante X-Posts, Reddit-Diskussionen, Forum-Debatten hier einbauen.
 
-REGELN:
-- Jede Story mit verlinktem Titel (HTML-Anker auf Original-URL).
-- Keine reinen Pressemitteilungen oder Sponsored Content.
-- Keine Bullet-Point-Wüsten: fliessender Zeitungstext bevorzugen.
-- HTML only, kein Markdown. Vollstaendiges, selbststaendiges HTML-Dokument.
-- Inline-CSS fuer alle Styles (Email-Client-kompatibel).
+TECHNISCHE REGELN:
+- Reines HTML mit Inline-CSS. Kein Markdown, keine Code-Fences, kein ```html am Anfang.
+- Beginne direkt mit <!DOCTYPE html> oder <html>.
+- Alle Styles inline (Email-Client-Kompatibilitaet).
+- Jede Story mit verlinktem Titel als HTML-Anker.
+- Keine reinen Pressemitteilungen ohne Einordnung.
 """.strip()
 
     user_prompt = f"""
@@ -178,7 +208,8 @@ Heute ist {weekday}, {date_str}. Hier sind die aktuellen Artikel der letzten {LO
 
 {build_article_block(articles)}
 
-Schreibe jetzt den vollstaendigen Newsletter als HTML.
+Schreibe jetzt den vollstaendigen Newsletter als reines HTML. Beginne direkt mit <!DOCTYPE html>.
+Kein ```html, keine Markdown-Formatierung, nur sauberes HTML.
 """.strip()
 
     message = client.messages.create(
@@ -187,7 +218,15 @@ Schreibe jetzt den vollstaendigen Newsletter als HTML.
         system=system_prompt,
         messages=[{"role": "user", "content": user_prompt}],
     )
-    return message.content[0].text
+
+    html = message.content[0].text.strip()
+    if html.startswith("```html"):
+        html = html[7:]
+    if html.startswith("```"):
+        html = html[3:]
+    if html.endswith("```"):
+        html = html[:-3]
+    return html.strip()
 
 
 def send_email(html_body: str):
