@@ -214,7 +214,7 @@ Kein ```html, keine Markdown-Formatierung, nur sauberes HTML.
 
     message = client.messages.create(
         model="claude-sonnet-4-5",
-        max_tokens=8192,
+        max_tokens=20000,
         system=system_prompt,
         messages=[{"role": "user", "content": user_prompt}],
     )
