@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 SENDGRID_API_KEY  = os.environ["SENDGRID_API_KEY"]
 ICLOUD_EMAIL      = os.environ["ICLOUD_EMAIL"]
-RECIPIENT_EMAIL   = os.environ.get("RECIPIENT_EMAIL", ICLOUD_EMAIL)
+RECIPIENT_EMAIL = "theodor.klink@icloud.com"
 
 LOOKBACK_HOURS = 72
 MAX_ARTICLES   = 50
