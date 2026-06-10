@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 SENDGRID_API_KEY  = os.environ["SENDGRID_API_KEY"]
 ICLOUD_EMAIL      = os.environ["ICLOUD_EMAIL"]
-RECIPIENT_EMAIL = "theodor.klink@icloud.com"
+RECIPIENT_EMAIL   = "theodor.klink@icloud.com"
 
 LOOKBACK_HOURS = 72
 MAX_ARTICLES   = 50
@@ -99,9 +99,12 @@ def build_article_block(articles: list[dict]) -> str:
 
 
 def generate_newsletter(articles: list[dict]) -> str:
-    client   = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-    date_str = datetime.now().strftime("%d. %B %Y")
-    weekday  = datetime.now().strftime("%A")
+    client    = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    now       = datetime.now()
+    date_str  = now.strftime("%d. %B %Y")
+    weekday   = now.strftime("%A")
+    kw        = now.isocalendar()[1]
+    year      = now.year
 
     system_prompt = """
 Du schreibst einen professionellen, zweimal wöchentlich erscheinenden AI-Newsletter für Theodor.
@@ -138,14 +141,15 @@ werden wenn sie substanziell sind. Lieber zu viel als zu wenig.
 STRUKTUR (exakt in dieser Reihenfolge):
 
 1. HEADER
-   "THE AI BRIEFING" in Versalien, Georgia Bold, 38px. Darunter: Datum und Ausgabennummer.
+   "THE AI BRIEFING" in Versalien, Georgia Bold, 38px. Darunter: Wochentag, Datum und
+   Kalenderwoche im Format "Mittwoch, 10. Juni 2026 - KW 24/2026".
    Tagline kursiv: "Ihr zweiwöchentlicher Überblick über künstliche Intelligenz, Märkte und Geopolitik"
    Trennlinie.
 
 2. LAGE DES MARKTES
    Label: "LAGE DES MARKTES"
-   2-3 Absaetze. Globaler AI-Markt der letzten Tage. Was hat sich seit der letzten Ausgabe
-   veraendert? Wo stehen die grossen Labore, die Boersen, die Regulierer? Ton: FT-Leitartikel.
+   2-3 Absaetze. Globaler AI-Markt der letzten Tage. Was hat sich veraendert?
+   Wo stehen die grossen Labore, die Boersen, die Regulierer? Ton: FT-Leitartikel.
 
 3. TOP STORY
    Label: "TOP STORY"
@@ -204,17 +208,19 @@ TECHNISCHE REGELN:
 """.strip()
 
     user_prompt = f"""
-Heute ist {weekday}, {date_str}. Hier sind die aktuellen Artikel der letzten {LOOKBACK_HOURS} Stunden:
+Heute ist {weekday}, {date_str}, Kalenderwoche {kw}/{year}.
+Hier sind die aktuellen Artikel der letzten {LOOKBACK_HOURS} Stunden:
 
 {build_article_block(articles)}
 
 Schreibe jetzt den vollstaendigen Newsletter als reines HTML. Beginne direkt mit <!DOCTYPE html>.
 Kein ```html, keine Markdown-Formatierung, nur sauberes HTML.
+Zeige im Header die Kalenderwoche als "KW {kw}/{year}".
 """.strip()
 
     message = client.messages.create(
         model="claude-sonnet-4-5",
-        max_tokens=20000,
+        max_tokens=16000,
         system=system_prompt,
         messages=[{"role": "user", "content": user_prompt}],
     )
@@ -230,8 +236,11 @@ Kein ```html, keine Markdown-Formatierung, nur sauberes HTML.
 
 
 def send_email(html_body: str):
-    date_str = datetime.now().strftime("%d.%m.%Y")
-    subject  = f"The AI Briefing — {date_str}"
+    now      = datetime.now()
+    kw       = now.isocalendar()[1]
+    year     = now.year
+    date_str = now.strftime("%d.%m.%Y")
+    subject  = f"The AI Briefing - KW {kw}/{year} - {date_str}"
 
     message = Mail(
         from_email=ICLOUD_EMAIL,
@@ -242,7 +251,7 @@ def send_email(html_body: str):
 
     sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
     response = sg.send(message)
-    print(f"[OK] Newsletter sent. Status: {response.status_code}")
+    print(f"[OK] Newsletter sent to {RECIPIENT_EMAIL}. Status: {response.status_code}")
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
