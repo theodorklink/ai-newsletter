@@ -19,7 +19,7 @@ ICLOUD_EMAIL      = os.environ["ICLOUD_EMAIL"]
 
 RECIPIENT_EMAILS  = [
     "theodor.klink@icloud.com",
-    "henri.grimme@whu.edu", 
+    "grimme.henri@gmail.com", 
     "cvf@schmidtcolleg.de"
 ]
 
