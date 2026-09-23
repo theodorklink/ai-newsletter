@@ -20,7 +20,8 @@ ICLOUD_EMAIL      = os.environ["ICLOUD_EMAIL"]
 RECIPIENT_EMAILS  = [
     "theodor.klink@icloud.com",
     "grimme.henri@gmail.com", 
-    "cvf@schmidtcolleg.de"
+    "cvf@schmidtcolleg.de",
+    "louis.mody@web.de"
 ]
 
 LOOKBACK_HOURS = 72
