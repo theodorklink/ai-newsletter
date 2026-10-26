@@ -17,6 +17,7 @@ ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 SENDGRID_API_KEY  = os.environ["SENDGRID_API_KEY"]
 ICLOUD_EMAIL      = os.environ["ICLOUD_EMAIL"]
 ANTHROPIC_MODEL   = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5-5")
+MAX_OUTPUT_TOKENS = int(os.environ.get("ANTHROPIC_MAX_TOKENS", "32000"))
 
 RECIPIENT_EMAILS  = [
     "theodor.klink@icloud.com",
@@ -192,18 +193,23 @@ Hier sind die aktuellen Artikel der letzten {LOOKBACK_HOURS} Stunden:
 
 Schreibe jetzt den vollstaendigen Newsletter als reines HTML. Beginne direkt mit <!DOCTYPE html>.
 Zeige im Header die Kalenderwoche als "KW {kw}/{year}".
+Schliesse das Dokument vollstaendig mit </body></html> ab. Plane die Laenge so, dass auch bei umfangreichen Nachrichten alle elf Sektionen fertig werden. Vermeide CSS-Wiederholungen und fuellende Formulierungen, ohne relevante Entwicklungen auszulassen.
 """.strip()
 
-    message = client.messages.create(
+    # Sonnet 5.5 supports up to 128k output tokens. The Python SDK requires
+    # streaming once max_tokens exceeds 21,333.
+    with client.messages.stream(
         model=ANTHROPIC_MODEL,
-        max_tokens=16000,
+        max_tokens=MAX_OUTPUT_TOKENS,
         thinking={"type": "between_tools"},
         system=system_prompt,
         messages=[{"role": "user", "content": user_prompt}],
-    )
+    ) as stream:
+        message = stream.get_final_message()
 
+    print(f"[INFO] Claude model={message.model}, output_tokens={message.usage.output_tokens}, stop_reason={message.stop_reason}")
     if message.stop_reason == "max_tokens":
-        raise RuntimeError("Claude hit max_tokens. Newsletter not sent to avoid incomplete output.")
+        raise RuntimeError(f"Claude hit max_tokens={MAX_OUTPUT_TOKENS}. Newsletter not sent to avoid incomplete output.")
     html = "".join(block.text for block in message.content if block.type == "text").strip()
     if not html:
         raise RuntimeError("Claude returned no newsletter HTML. Email not sent.")
@@ -213,7 +219,10 @@ Zeige im Header die Kalenderwoche als "KW {kw}/{year}".
         html = html[3:]
     if html.endswith("```"):
         html = html[:-3]
-    return html.strip()
+    html = html.strip()
+    if not html.lower().startswith("<!doctype html") or not html.lower().endswith("</html>"):
+        raise RuntimeError("Claude returned incomplete HTML. Newsletter was not sent.")
+    return html
 
 
 def send_email(html_body: str):
