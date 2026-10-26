@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 SENDGRID_API_KEY  = os.environ["SENDGRID_API_KEY"]
 ICLOUD_EMAIL      = os.environ["ICLOUD_EMAIL"]
+ANTHROPIC_MODEL   = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 
 RECIPIENT_EMAILS  = [
     "theodor.klink@icloud.com",
@@ -194,13 +195,18 @@ Zeige im Header die Kalenderwoche als "KW {kw}/{year}".
 """.strip()
 
     message = client.messages.create(
-        model="claude-sonnet-4-5",
+        model=ANTHROPIC_MODEL,
         max_tokens=16000,
+        thinking={"type": "between_tools"},
         system=system_prompt,
         messages=[{"role": "user", "content": user_prompt}],
     )
 
-    html = message.content[0].text.strip()
+    if message.stop_reason == "max_tokens":
+        raise RuntimeError("Claude hit max_tokens. Newsletter not sent to avoid incomplete output.")
+    html = "".join(block.text for block in message.content if block.type == "text").strip()
+    if not html:
+        raise RuntimeError("Claude returned no newsletter HTML. Email not sent.")
     if html.startswith("```html"):
         html = html[7:]
     if html.startswith("```"):
@@ -225,8 +231,16 @@ def send_email(html_body: str):
     )
 
     sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
-    response = sg.send(message)
-    print(f"[OK] Newsletter sent to {len(RECIPIENT_EMAILS)} recipients. Status: {response.status_code}")
+    try:
+        response = sg.send(message)
+    except Exception as exc:
+        status = getattr(exc, "status_code", "unknown")
+        body = getattr(exc, "body", b"")
+        if isinstance(body, bytes):
+            body = body.decode("utf-8", errors="replace")
+        print(f"[ERROR] SendGrid HTTP status {status}: {str(body)[:1200]}")
+        raise
+    print(f"[OK] SendGrid accepted request for {len(RECIPIENT_EMAILS)} recipients. Status: {response.status_code}")
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────

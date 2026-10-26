@@ -1,7 +1,8 @@
 on:
   schedule:
-    - cron: "0 6 * * 3"
-    - cron: "0 6 * * 0"
+    # 07:00 Berlin local time: summer = 05:00 UTC, winter = 06:00 UTC.
+    - cron: "0 5 * * 0,3"
+    - cron: "0 6 * * 0,3"
   workflow_dispatch:
 
 jobs:
@@ -15,9 +16,30 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Select correct Europe/Berlin DST schedule
+        id: berlin_schedule
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          python - <<'PY'
+          import os
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          berlin_now = datetime.now(ZoneInfo("Europe/Berlin"))
+          summer_time = bool(berlin_now.dst().total_seconds())
+          expected = "0 5 * * 0,3" if summer_time else "0 6 * * 0,3"
+          should_run = os.environ["EVENT_NAME"] == "workflow_dispatch" or os.environ.get("EVENT_SCHEDULE") == expected
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"should_run={str(should_run).lower()}\n")
+          print(f"Berlin time: {berlin_now.isoformat()}; execute newsletter: {should_run}")
+          PY
       - name: Install dependencies
-        run: pip install anthropic feedparser python-dateutil sendgrid
+        if: steps.berlin_schedule.outputs.should_run == 'true'
+        run: pip install -r requirements.txt
       - name: Run newsletter script
+        if: steps.berlin_schedule.outputs.should_run == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
